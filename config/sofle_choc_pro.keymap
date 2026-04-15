@@ -1,9 +1,3 @@
-/*
-* Copyright (c) 2020 The ZMK Contributors
-*
-* SPDX-License-Identifier: MIT
-*/
-
 #include <dt-bindings/zmk/mouse.h>
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/bt.h>
@@ -13,29 +7,32 @@
 #include "zmk-helpers.h"
 #include "keys_de.h"
 
+/* Layer Definitionen */
 #define BASE 0
 #define LOWER 1
 #define RAISE 2
 #define ADJUST 3
 #define ADOBE 4
 
+/* Hardware-Aktivierung */
+&left_encoder { status = "okay"; };
+&right_encoder { status = "okay"; };
+
 / {
     behaviors {
         // hm steht für Home-Row-Mods
-
         hm: home_row_mods {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
-            tapping-term-ms = <250>;    // Etwas länger warten für Modifikatoren
-            quick-tap-ms = <150>;      // Erleichtert doppeltes Tippen (z.B. "Staat")
-            flavor = "tap-preferred";  // Priorisiert den Buchstaben beim Tippen
+            tapping-term-ms = <250>;    
+            quick-tap-ms = <150>;      
+            flavor = "tap-preferred";  
             bindings = <&kp>, <&kp>;
         };
     };
 
     conditional_layers {
         compatible = "zmk,conditional-layers";
-
         adjust_layer {
             if-layers = <1 2>;
             then-layer = <3>;
@@ -45,19 +42,14 @@
     combos {
         compatible = "zmk,combos";
 
-        /* Diese Combo schaltet den Adobe-Layer ein, wenn er aus ist, 
-           und aus, wenn er an ist. Da kein 'layers' angegeben ist,
-           funktioniert sie immer.
-        */
-
         toggle_adobe {
             bindings = <&tog ADOBE>;
-            key-positions = <52 57>;
+            key-positions = <52 57>; // Prüfe ob diese Index-Positionen bei deiner Matrix passen
             timeout-ms = <50>;
         };
 
         external_toggle {
-            bindings = <&ext_power EP_TOG>; // Schaltet Displays ein UND aus
+            bindings = <&ext_power EP_TOG>; 
             key-positions = <5 6>;
             timeout-ms = <50>;
         };
@@ -67,105 +59,66 @@
         compatible = "zmk,keymap";
 
         default_layer {
-            display-name = "default";
-
-            // ------------------------------------------------------------------------------------------------------------
-            // |   `   |  1  |  2  |  3   |  4   |  5   |                   |  6   |  7    |  8    |  9   |   0   |   `   |
-            // |  ESC  |  Q  |  W  |  E   |  R   |  T   |                   |  Y   |  U    |  I    |  O   |   P   | BKSPC |
-            // |  TAB  |  A  |  S  |  D   |  F   |  G   |                   |  H   |  J    |  K    |  L   |   ;   |   '   |
-            // | SHIFT |  Z  |  X  |  C   |  V   |  B   |  MUTE  |  | PLAY  |  N   |  M    |  ,    |  .   |   /   | SHIFT |
-            //               | GUI | ALT  | CTRL | LOWER|  ENTER |  | SPACE | RAISE| CTRL  | ALT   | GUI  |
-
+            display-name = "Base";
             bindings = <
-&kp DELETE  &kp N1                 &kp NUMBER_2       &kp N3               &kp N4          &kp N5                          &kp N6  &kp N7     &kp N8     &kp N9    &kp N0     &kp BACKSPACE
-&kp ESC     &kp Q                  &kp W              &kp E                &kp R           &kp T   &kp Y                           &kp U      &kp I      &kp O     &kp P      &kp LEFT_BRACKET
-&kp TAB     &hm LEFT_CONTROL DE_A  &hm LEFT_ALT DE_S  &hm LEFT_SHIFT DE_D  &hm SPACE DE_F  &kp G   &kp H                           &kp J      &kp K      &kp L     &kp SEMI   &kp SQT
-&kp LSHFT   &kp Z                  &kp X              &kp C                &kp V           &kp B   &kp C_MUTE  &kp C_PLAY  &kp N   &kp M      &kp COMMA  &kp DOT   &kp SLASH  &kp RSHFT
-                                   &kp LGUI           &kp LALT             &kp LCTRL       &mo 1   &kp RET     &kp SPACE   &mo 2   &kp RCTRL  &kp RALT   &kp RGUI
+&kp DELETE  &kp N1                &kp N2             &kp N3               &kp N4             &kp N5                                    &kp N6  &kp N7     &kp N8     &kp N9    &kp N0       &kp BACKSPACE
+&kp ESC     &kp Q                 &kp W              &kp E                &kp R              &kp T                                     &kp Y   &kp U      &kp I      &kp O     &kp P        &kp DE_PLUS
+&kp TAB     &hm LEFT_CONTROL DE_A &hm LEFT_ALT DE_S  &hm LEFT_SHIFT DE_D  &kp DE_F           &kp G                                     &kp H   &kp J      &kp K      &kp L     &kp DE_SEMI  &kp DE_SQT
+&kp LSHFT   &kp Z                 &kp X              &kp C                &kp V              &kp B   &kp C_MUTE          &kp C_PLAY    &kp N   &kp M      &kp COMMA  &kp DOT   &kp DE_SLASH &kp RSHFT
+                                  &kp LGUI           &kp LALT             &kp LCTRL          &mo 1   &kp RET             &kp SPACE     &mo 2   &kp RCTRL  &kp RALT   &kp RGUI
             >;
 
-            sensor-bindings =
-                <&inc_dec_kp C_VOL_UP C_VOL_DN>,
-                <&inc_dec_kp LC(DE_PLUS) LC(DE_MINUS)>;
+            sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &inc_dec_kp LC(DE_PLUS) LC(DE_MINUS)>;
         };
 
         lower_layer {
-            display-name = "lower";
-
-            // ------------------------------------------------------------------------------------------------------------
-            // |       |  F1 |  F2 |  F3  |  F4  |  F5  |                   |  F6  |  F7   |  F8   |  F9  |  F10  |  F11  |
-            // |   `   |  1  |  2  |  3   |  4   |  5   |                   |  6   |  7    |  8    |  9   |   0   |  F12  |
-            // |       |  !  |  @  |  #   |  $   |  %   |                   |  ^   |  &    |  *    |  (   |   )   |   |   |
-            // |       |  =  |  -  |  +   |  {   |  }   |        |  |       |  [   |  ]    |  ;    |  :   |   \   |       |
-            //               |     |      |      |      |        |  |       |      |       |       |      |
-
+            display-name = "Lower";
             bindings = <
-&trans  &kp F1            &kp F2  &kp F4           &kp F5    &kp F6                  &kp F6            &kp F7         &kp F8      &kp F9  &kp F10  &kp F11
-&trans  &trans            &trans  &trans           &trans    &trans  &trans                            &trans         &trans      &trans  &trans   &trans
-&trans  &trans            &trans  &kp NON_US_HASH  &kp DLLR  &trans  &trans                            &kp LS(MINUS)  &kp LS(N1)  &trans  &trans   &trans
-&trans  &kp LS(NUMBER_2)  &trans  &trans           &trans    &trans  &trans  &trans  &kp LS(NUMBER_8)  &kp LS(N9)     &trans      &trans  &trans   &trans
-                          &trans  &trans           &trans    &trans  &trans  &trans  &trans            &trans         &trans      &trans
+&trans  &kp F1            &kp F2  &kp F4            &kp F5    &kp F6                    &kp F6         &kp F7       &kp F8      &kp F9  &kp F10  &kp F11
+&trans  &trans            &trans  &trans            &trans    &trans  &trans            &trans         &trans       &trans      &trans  &trans   &kp F12
+&trans  &trans            &trans  &kp DE_HASH       &kp DE_DLLR &trans  &trans            &kp DE_MINUS   &kp DE_EXCL  &trans      &trans  &trans   &trans
+&trans  &kp DE_DQMARK     &trans  &trans            &trans    &trans  &trans  &trans    &kp DE_LPAR    &kp DE_RPAR  &trans      &trans  &trans   &trans
+                          &trans  &trans            &trans    &trans  &trans  &trans    &trans         &trans       &trans      &trans
             >;
 
-            sensor-bindings =
-                <&inc_dec_kp C_VOL_DN C_VOL_UP>,
-                <&inc_dec_kp K_SCROLL_DOWN K_SCROLL_UP>;
+            sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP &inc_dec_kp K_SCROLL_DOWN K_SCROLL_UP>;
         };
 
         raise_layer {
-            display-name = "raise";
-
-            // ------------------------------------------------------------------------------------------------------------
-            // | BTCLR | BT1  | BT2  |  BT3  |  BT4  |  BT5 |                |      |      |       |      |       |       |
-            // |       | INS  | PSCR | GUI   |       |      |                | PGUP |      |   ^   |      |       |       |
-            // |       | ALT  | CTRL | SHIFT |       | CAPS |                | PGDN |   <- |   v   |  ->  |  DEL  | BKSPC |
-            // |       | UNDO | CUT  | COPY  | PASTE |      |      |  |      |      |      |       |      |       |       |
-            //                |      |       |       |      |      |  |      |      |      |       |      |
-
+            display-name = "Raise";
             bindings = <
-&bt BT_CLR  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4                     &trans  &trans    &trans    &trans     &trans  &studio_unlock
-&trans      &kp INS       &kp PSCRN     &kp K_CMENU   &trans        &trans        &kp PG_UP                  &trans    &kp UP    &trans     &trans  &trans
-&trans      &trans        &kp MINUS     &trans        &trans        &kp CLCK      &kp PG_DN                  &kp LEFT  &kp DOWN  &kp RIGHT  &trans  &trans
-&trans      &kp K_UNDO    &kp K_CUT     &kp K_COPY    &kp K_PASTE   &trans        &trans     &trans  &trans  &trans    &trans    &trans     &trans  &trans
-                          &trans        &trans        &trans        &trans        &trans     &trans  &trans  &trans    &trans    &trans
+&bt BT_CLR  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4                  &trans    &trans    &trans     &trans    &trans  &studio_unlock
+&trans      &kp INS       &kp PSCRN     &kp K_CMENU   &trans        &trans                        &kp PG_UP &trans    &kp UP     &trans    &trans  &trans
+&trans      &trans        &kp DE_MINUS  &trans        &trans        &kp CLCK                      &kp PG_DN &kp LEFT  &kp DOWN   &kp RIGHT &kp DEL &kp BACKSPACE
+&trans      &kp K_UNDO    &kp K_CUT     &kp K_COPY    &kp K_PASTE   &trans        &trans  &trans  &trans    &trans    &trans     &trans    &trans  &trans
+                          &trans        &trans        &trans        &trans        &trans  &trans  &trans    &trans    &trans     &trans
             >;
 
-            sensor-bindings =
-                <&inc_dec_kp C_VOL_DN C_VOL_UP>,
-                <&inc_dec_kp K_SCROLL_DOWN K_SCROLL_UP>;
+            sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP &inc_dec_kp K_SCROLL_DOWN K_SCROLL_UP>;
         };
 
         adjust_layer {
-            // ----------------------------------------------------------------------------------------------------------------------------
-            // | BTCLR  |  BT1    |  BT2    |   BT3   |   BT4   |   BT5   |                  |      |      |       |      |       |       |
-            // | EXTPWR | RGB_HUD | RGB_HUI | RGB_SAD | RGB_SAI | RGB_EFF |                  |      |      |       |      |       |       |
-            // |        | RGB_BRD | RGB_BRI |         |         |         |                  |      |      |       |      |       |       |
-            // |        |         |         |         |         |         | RGB_TOG | |      |      |      |       |      |       |       |
-            //                    |         |         |         |         |         | |      |      |      |       |      |
-
-            display-name = "adjust";
+            display-name = "Adjust";
             bindings = <
 &bt BT_CLR         &bt BT_SEL 0     &bt BT_SEL 1     &bt BT_SEL 2     &bt BT_SEL 3     &bt BT_SEL 4                             &studio_unlock  &none  &none  &none  &none   &none
-&ext_power EP_TOG  &rgb_ug RGB_HUD  &rgb_ug RGB_HUI  &rgb_ug RGB_SAD  &rgb_ug RGB_SAI  &rgb_ug RGB_EFF  &none                                   &none  &none  &none  &none   &none
-&none              &rgb_ug RGB_BRD  &rgb_ug RGB_BRI  &none            &none            &none            &none                                   &none  &none  &none  &none   &none
+&ext_power EP_TOG  &rgb_ug RGB_HUD  &rgb_ug RGB_HUI  &rgb_ug RGB_SAD  &rgb_ug RGB_SAI  &rgb_ug RGB_EFF  &none                   &none           &none  &none  &none  &none   &none
+&none              &rgb_ug RGB_BRD  &rgb_ug RGB_BRI  &none            &none            &none            &none                   &none           &none  &none  &none  &none   &none
 &none              &none            &none            &none            &trans           &trans           &rgb_ug RGB_TOG  &none  &none           &none  &none  &none  &trans  &none
                                     &none            &none            &none            &none            &none            &none  &none           &none  &none  &none
             >;
         };
 
         adobe_layer {
-            display-name = "adobe";
+            display-name = "Adobe";
             bindings = <
-&kp DEL         &none                  &none                  &kp DE_N1              &kp DE_N0              &kp BACKSPACE                           &kp KP_NUMBER_7  &kp KP_NUMBER_8  &kp KP_NUMBER_9  &none  &to 0  &none
-&kp LC(SLASH)   &kp DE_P               &kp DE_W               &kp DE_E               &kp F5                 &none           &kp KP_NUMBER_4                          &kp KP_NUMBER_5  &kp KP_NUMBER_6  &none  &none  &none
-&kp LC(RBKT)    &hm LEFT_CONTROL DE_A  &hm LEFT_CONTROL DE_S  &hm LEFT_CONTROL DE_D  &hm LEFT_CONTROL DE_F  &kp F5          &kp KP_NUMBER_1                          &kp KP_NUMBER_2  &kp KP_NUMBER_3  &none  &none  &none
-&kp LEFT_SHIFT  &none                  &kp DE_X               &kp DE_C               &kp DE_V               &kp LEFT_SHIFT  &none            &none  &kp KP_NUMBER_0  &none            &none            &none  &none  &none
-                                       &trans                 &trans                 &trans                 &kp SPACE       &kp RET          &none  &none            &trans           &trans           &none
+&kp DEL        &none                 &none                 &kp DE_N1             &kp DE_N0             &kp BACKSPACE                          &kp KP_N7  &kp KP_N8  &kp KP_N9  &none  &to 0  &none
+&kp LC(DE_SLSH) &kp DE_P              &kp DE_W              &kp DE_E              &kp F5                &none                                  &kp KP_N4  &kp KP_N5  &kp KP_N6  &none  &none  &none
+&kp LC(DE_RBKT) &hm LEFT_CONTROL DE_A &hm LEFT_CONTROL DE_S &hm LEFT_CONTROL DE_D &hm LEFT_CONTROL DE_F &kp F5                                  &kp KP_N1  &kp KP_N2  &kp KP_N3  &none  &none  &none
+&kp LSHFT      &none                 &kp DE_X              &kp DE_C              &kp DE_V              &kp LSHFT  &none         &none         &kp KP_N0  &none      &none      &none  &none  &none
+                                     &trans                &trans                &trans                &kp SPACE  &kp RET       &none         &none      &trans     &trans     &none
             >;
 
-            sensor-bindings =
-                <&inc_dec_kp C_VOL_DN C_VOL_UP>,
-                <&inc_dec_kp LC(SLASH) LC(RBKT)>;
+            sensor-bindings = <&inc_dec_kp C_VOL_DN C_VOL_UP &inc_dec_kp LC(DE_SLSH) LC(DE_RBKT)>;
         };
     };
 };
